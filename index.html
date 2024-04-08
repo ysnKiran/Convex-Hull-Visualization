@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="hero-container">
+        <div class="hero-overlay">
+            <h1 class="title" style="font-weight: 600;">CONVEX HULL VISUALIZATION</h1>
+            <div class="can">
+                <canvas id="canvas"></canvas>
+            </div>
+            <div class="controls">
+                <select id="algorithmSelect">
+                    <option value="jarvisMarch">Jarvis March</option>
+                    <option value="kirkpatrickSeidel">Kirkpatrick-Seidel</option>
+                </select>
+                <button onclick="generateRandomPoints()">Generate Random Points</button>
+                <button onclick="clearCanvas()">Clear Canvas</button>
+                <button onclick="computeConvexHull()">Compute Convex Hull</button>
+                <button id="myToggleButton" class="toggle-button" onclick="toggleManualPlacement()">Manual Placement Mode</button>
+                
+            </div>
+            <div class="slider-container">
+                <input type="range" min="0" value="0" id="slider" oninput="updateStep(this.value)">
+                <span id="stepLabel">Step 0</span>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

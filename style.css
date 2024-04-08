@@ -1,0 +1,203 @@
+/* Add or modify CSS rules */
+
+@font-face {
+    font-family:'ClashDisplay-Variable';
+    src: url('../js/fonts/ClashDisplay-Variable.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Gilroy';
+    src: url('../js/fonts/Gilroy-Light.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Gilroy-Bold';
+    src: url('../js/fonts/Gilroy-Bold.ttf') format('truetype');
+}
+
+body {
+    font-family: 'ClashDisplay-Variable';
+    background-color: #f0f0f0;
+    margin: 0;
+    padding: 0;
+}
+
+.hero-container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0 auto;
+    background-image: url('bg.svg');
+    background-size: cover;
+    background-position: center;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+}
+
+.hero-overlay {
+    position: relative; /* Change to relative */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.title {
+    font-size: 3.5rem; /* Adjust font size as needed */
+    color: #fff; /* Adjust font color */
+    margin-bottom: 20px; /* Add spacing */
+    font-family: 'Gilroy-Bold';
+
+    
+}
+
+.can {
+    display: flex;
+    justify-content: center;
+    margin: 20px; /* Adjust margin as needed */
+    padding: 10px; /* Add padding */
+
+}
+#algorithmSelect {
+    padding: 20px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 36px;
+    background-color: #ffffff;
+    color: #333;
+    margin-right: 20px;
+  }
+
+  #algorithmSelect:focus {
+    outline: none;
+    border-color: #380074;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+  }
+
+canvas {
+    width: 1200px;
+    height: 600px;
+    border: 1px solid #ccc;
+    box-shadow: 0 5px 15px rgba(211, 182, 255, 0.181);
+    border-radius: 24px;
+}
+
+.controls {
+    display: flex;
+    padding: 20px; /* Reduced padding */
+    flex-direction: row;
+    justify-content: center;
+}
+
+.controls button {
+    margin-right: 10px;
+    display: inline-block;
+    padding: 10px 20px;
+    color: #fff;
+    border-radius: 35px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-family: 'ClashDisplay-Variable';
+    font-size: medium;
+    border: 1px solid #ccc;
+    background-color: transparent;
+}
+
+.controls button:hover {
+    color: #ffffff;
+    box-shadow: 0 5px 15px rgba(211, 182, 255, 0.353);
+    border: 1px solid #80fff2;
+}
+
+.toggle-button {
+    margin-right: 10px;
+    display: inline-block;
+    padding: 10px 20px;
+    color: #fff;
+    border-radius: 35px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-family: 'ClashDisplay-Variable';
+    font-size: medium;
+    border: 1px solid #ccc;
+    background-color: transparent;
+    position: relative;
+}
+
+.toggle-button::before {
+    content: '';
+    position: relative;
+    top: 2px;
+    left: 2px;
+    width: 40px; /* Adjust width of the toggle circle */
+    height: 40px; /* Adjust height of the toggle circle */
+    background-color: #fff;
+    border-radius: 50%;
+    transition: transform 0.3s;
+}
+
+.toggle-button.active::before {
+    transform: translateX(50px); /* Adjust distance of toggle circle to mimic 'on' state */
+}
+
+.toggle-button:hover::before {
+    border-color: #80fff2; /* Adjust color when hovering */
+}
+
+.toggle-button.active {
+    border-color: #20ffff; /* Adjust background color when 'on' */
+    box-shadow: 0 5px 15px rgba(211, 182, 255, 0.353);
+
+
+}
+
+.slider-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    color: #80fff2;
+  }
+  
+  #slider {
+    flex: 1;
+    margin-right: 10px;
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 5px;
+    background-color: #ffffff;
+    outline: none;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+    border-radius: 5px;
+  }
+  
+  #slider:hover {
+    opacity: 1;
+  }
+  
+  #slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background-color: #20ffff;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+  
+  #slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    background-color: #20ffff;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+  
+  #stepLabel {
+    font-size: 16px;
+  }
