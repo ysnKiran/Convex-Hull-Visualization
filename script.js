@@ -183,15 +183,17 @@ function updateStepJarvisMarch(stepValue) {
         ctx.lineWidth = 2 * dpr; // Account for pixel ratio
         ctx.stroke();
     }
+
+    
 }
 
-// Function to compute orientation
-function orientation(p, q, r) {
-    if (!r) return 0; // Return 0 if r is undefined
-    const val = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y);
-    if (val === 0) return 0;
-    return val > 0 ? 1 : -1;
-}
+// // Function to compute orientation
+// function orientation(p, q, r) {
+//     if (!r) return 0; // Return 0 if r is undefined
+//     const val = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y);
+//     if (val === 0) return 0;
+//     return val > 0 ? 1 : -1;
+// }
 
 // Function to compute convex hull using Kirkpatrick-Seidel algorithm
 function computeConvexHullKirkpatrickSeidel() {
@@ -207,34 +209,7 @@ function computeConvexHullKirkpatrickSeidel() {
     updateStepKirkpatrickSeidel(0); // Reset step to 0
 }
 
-// Function to recursively find the convex hull using Kirkpatrick-Seidel algorithm
-function kirkpatrickSeidel(points) {
-    // Base case: If there are only 3 or fewer points, return them
-    if (points.length <= 3) {
-        convexHullSteps.push({ hull: points });
-        return points;
-    }
 
-    // Sort points by x-coordinate
-    points.sort((a, b) => a.x - b.x);
-
-    // Find the median x-coordinate
-    const medianIndex = Math.floor(points.length / 2);
-    const medianX = points[medianIndex].x;
-
-    // Find the intersection edges
-    const intersectionEdges = findIntersectionEdges(points, medianX);
-
-    // Discard non-contributing points
-    const remainingPoints = discardNonContributingPoints(points, intersectionEdges);
-
-    // Recursively find upper and lower hulls
-    const upperHull = kirkpatrickSeidel(remainingPoints.upper);
-    const lowerHull = kirkpatrickSeidel(remainingPoints.lower);
-
-    // Merge upper and lower hulls
-    return mergeConvexHulls(upperHull, lowerHull);
-}
 
 // Function to find intersection edges
 function findIntersectionEdges(points, medianX) {
@@ -292,34 +267,215 @@ function discardNonContributingPoints(points, intersectionEdges) {
             }
         }
         if (isContributing) {
-            if (points[i].y < bridgeEdge.from.y) {
-                lowerPoints.push(points[i]);
-            } else if (points[i].y > bridgeEdge.from.y) {
+            if (bridgeEdge) {
+                if (points[i].y < bridgeEdge.from.y) {
+                    lowerPoints.push(points[i]);
+                } else if (points[i].y > bridgeEdge.from.y) {
+                    upperPoints.push(points[i]);
+                }
+            } else {
                 upperPoints.push(points[i]);
+                lowerPoints.push(points[i]);
             }
         }
     }
 
     return { upper: upperPoints, lower: lowerPoints };
 }
-
-// Function to merge the convex hulls of upper and lower sets
 function mergeConvexHulls(upperHull, lowerHull) {
-    // Remove duplicate points from upperHull and lowerHull
-    upperHull = upperHull.filter((point, index, self) => self.findIndex(p => p.x === point.x && p.y === point.y) === index);
-    lowerHull = lowerHull.filter((point, index, self) => self.findIndex(p => p.x === point.x && p.y === point.y) === index);
+    const mergedHull = [];
 
-    // Merge the upper and lower hulls
-    const mergedHull = [...upperHull, ...lowerHull];
+    // Find the rightmost point of the upper hull
+    let rightmostUpperIndex = 0;
+    for (let i = 1; i < upperHull.length; i++) {
+        if (upperHull[i].x > upperHull[rightmostUpperIndex].x) {
+            rightmostUpperIndex = i;
+        }
+    }
 
-    // Sort merged hull by x-coordinate
-    mergedHull.sort((a, b) => a.x - b.x || a.y - b.y);
+    // Find the leftmost point of the lower hull
+    let leftmostLowerIndex = 0;
+    for (let i = 1; i < lowerHull.length; i++) {
+        if (lowerHull[i].x < lowerHull[leftmostLowerIndex].x) {
+            leftmostLowerIndex = i;
+        }
+    }
 
-    convexHullSteps.push({ hull: mergedHull });
+    // Merge the hulls starting from the rightmost point of the upper hull
+    let currentPoint = upperHull[rightmostUpperIndex];
+    let currentUpperIndex = rightmostUpperIndex;
+    let currentLowerIndex = leftmostLowerIndex;
+
+    // Add the points from the upper hull
+    do {
+        mergedHull.push(currentPoint);
+        currentUpperIndex = (currentUpperIndex + 1) % upperHull.length;
+        currentPoint = upperHull[currentUpperIndex];
+    } while (currentUpperIndex !== rightmostUpperIndex);
+
+    // Add the points from the lower hull
+    do {
+        mergedHull.push(currentPoint);
+        currentLowerIndex = (currentLowerIndex + 1) % lowerHull.length;
+        currentPoint = lowerHull[currentLowerIndex];
+    } while (currentLowerIndex !== leftmostLowerIndex);
+
+    // Add the leftmost point of the lower hull to close the hull
+    mergedHull.push(lowerHull[leftmostLowerIndex]);
+
     return mergedHull;
 }
 
-// Function to update step for Kirkpatrick-Seidel algorithm
+function orientation(p, q, r) {
+    const val = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y);
+    if (val === 0) return 0; // Collinear
+    return val > 0 ? 1 : -1; // Clockwise or counterclockwise
+}
+
+function findUpperHull(points) {
+    if (points.length <= 2) {
+        return points;
+    }
+
+    // Sort points by x-coordinate
+    points.sort((a, b) => a.x - b.x);
+
+    // Find the median x-coordinate
+    const medianIndex = Math.floor(points.length / 2);
+    const medianX = points[medianIndex].x;
+
+    // Partition points into left and right subsets
+    const leftPoints = points.slice(0, medianIndex);
+    const rightPoints = points.slice(medianIndex);
+
+    // Find the upper bridge
+    const [p, q] = findUpperBridge(leftPoints, rightPoints);
+
+    // Partition left and right subsets based on the upper bridge
+    const leftSubset = leftPoints.filter(point => point.x <= p.x);
+    const rightSubset = rightPoints.filter(point => point.x >= q.x);
+
+    // Recursively find the upper hulls of the left and right subsets
+    const leftUpperHull = findUpperHull(leftSubset);
+    const rightUpperHull = findUpperHull(rightSubset);
+
+    // Concatenate the left upper hull, upper bridge, and right upper hull
+    return [...leftUpperHull, p, q, ...rightUpperHull];
+}
+
+function findUpperBridge(leftPoints, rightPoints) {
+    let leftBridge = leftPoints[leftPoints.length - 1];
+    let rightBridge = rightPoints[0];
+
+    for (let i = leftPoints.length - 2; i >= 0; i--) {
+        const leftPoint = leftPoints[i];
+        if (orientation(leftPoint, rightBridge, leftBridge) === 1) {
+            leftBridge = leftPoint;
+        }
+    }
+
+    for (let i = 1; i < rightPoints.length; i++) {
+        const rightPoint = rightPoints[i];
+        if (orientation(leftBridge, rightPoint, rightBridge) === -1) {
+            rightBridge = rightPoint;
+        }
+    }
+
+    return [leftBridge, rightBridge];
+}
+
+function findLowerHull(points) {
+    if (points.length <= 2) {
+        return points;
+    }
+
+    // Sort points by x-coordinate
+    points.sort((a, b) => a.x - b.x);
+
+    // Find the median x-coordinate
+    const medianIndex = Math.floor(points.length / 2);
+    const medianX = points[medianIndex].x;
+
+    // Partition points into left and right subsets
+    const leftPoints = points.slice(0, medianIndex);
+    const rightPoints = points.slice(medianIndex);
+
+    // Find the lower bridge
+    const [p, q] = findLowerBridge(leftPoints, rightPoints);
+
+    // Partition left and right subsets based on the lower bridge
+    const leftSubset = leftPoints.filter(point => point.x <= p.x);
+    const rightSubset = rightPoints.filter(point => point.x >= q.x);
+
+    // Recursively find the lower hulls of the left and right subsets
+    const leftLowerHull = findLowerHull(leftSubset);
+    const rightLowerHull = findLowerHull(rightSubset);
+
+    // Concatenate the left lower hull, lower bridge, and right lower hull
+    return [...leftLowerHull, p, q, ...rightLowerHull];
+}
+
+function findLowerBridge(leftPoints, rightPoints) {
+    let leftBridge = leftPoints[leftPoints.length - 1];
+    let rightBridge = rightPoints[0];
+
+    for (let i = leftPoints.length - 2; i >= 0; i--) {
+        const leftPoint = leftPoints[i];
+        if (orientation(leftPoint, rightBridge, leftBridge) === -1) {
+            leftBridge = leftPoint;
+        }
+    }
+
+    for (let i = 1; i < rightPoints.length; i++) {
+        const rightPoint = rightPoints[i];
+        if (orientation(leftBridge, rightPoint, rightBridge) === 1) {
+            rightBridge = rightPoint;
+        }
+    }
+
+    return [leftBridge, rightBridge];
+}
+
+function kirkpatrickSeidel(points) {
+    if (points.length <= 3) {
+        convexHullSteps.push({ hull: points });
+        return points;
+    }
+
+    // Sort points by x-coordinate
+    points.sort((a, b) => a.x - b.x);
+
+    // Find the median x-coordinate
+    const medianIndex = Math.floor(points.length / 2);
+    const medianX = points[medianIndex].x;
+    convexHullSteps.push({ medianLine: { x: medianX }, points: [...points] });
+
+    // Find the intersection edges
+    const intersectionEdges = findIntersectionEdges(points, medianX);
+    convexHullSteps.push({ intersectionEdges: intersectionEdges, points: [...points] });
+
+    // Discard non-contributing points
+    const remainingPoints = discardNonContributingPoints(points, intersectionEdges);
+    convexHullSteps.push({
+        upperSubset: remainingPoints.upper,
+        lowerSubset: remainingPoints.lower,
+        discardedPoints: points.filter(p => !remainingPoints.upper.includes(p) && !remainingPoints.lower.includes(p)),
+        points: [...points]
+    });
+
+    // Recursively find upper and lower hulls
+    const upperHull = findUpperHull(remainingPoints.upper);
+    convexHullSteps.push({ upperHull: upperHull, points: [...points] });
+    const lowerHull = findLowerHull(remainingPoints.lower);
+    convexHullSteps.push({ lowerHull: lowerHull, points: [...points] });
+
+    // Merge upper and lower hulls
+    const mergedHull = mergeConvexHulls(upperHull, lowerHull);
+    convexHullSteps.push({ mergedHull: mergedHull, points: [...points] });
+
+    return mergedHull;
+}
+
 function updateStepKirkpatrickSeidel(stepValue) {
     currentStep = stepValue;
     const stepLabel = document.getElementById('stepLabel');
@@ -327,45 +483,102 @@ function updateStepKirkpatrickSeidel(stepValue) {
     const slider = document.getElementById('slider');
     slider.value = currentStep;
 
-    const { hull } = convexHullSteps[currentStep] || {};
+    const {
+        hull,
+        intersectionEdges,
+        upperSubset,
+        lowerSubset,
+        discardedPoints,
+        medianLine,
+        upperHull,
+        lowerHull,
+        mergedHull,
+        points
+    } = convexHullSteps[currentStep] || {};
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Draw points
+    // Draw initial points
     ctx.fillStyle = 'white';
     points.forEach(point => {
         ctx.beginPath();
-        ctx.arc(point.x, point.y, 3 * dpr, 0, Math.PI * 2); // Account for pixel ratio
+        ctx.arc(point.x, point.y, 3 * dpr, 0, Math.PI * 2);
         ctx.fill();
     });
 
-    // Draw current hull
-    if (hull) {
-        drawConvexHull(hull);
+    // Draw median line
+    if (medianLine) {
+        ctx.strokeStyle = 'purple';
+        ctx.lineWidth = 1 * dpr;
+        ctx.beginPath();
+        ctx.moveTo(medianLine.x, 0);
+        ctx.lineTo(medianLine.x, canvas.height);
+        ctx.stroke();
     }
 
+    // Draw bridge line
+    if (intersectionEdges && intersectionEdges.length === 1) {
+        const [p, q] = intersectionEdges[0];
+        ctx.strokeStyle = 'orange';
+        ctx.lineWidth = 2 * dpr;
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y);
+        ctx.lineTo(q.x, q.y);
+        ctx.stroke();
+    }
+
+    // Draw upper and lower subsets
+    if (upperSubset) {
+        ctx.fillStyle = 'red';
+        upperSubset.forEach(point => {
+            ctx.beginPath();
+            ctx.arc(point.x, point.y, 3 * dpr, 0, Math.PI * 2);
+            ctx.fill();
+        });
+    }
+    if (lowerSubset) {
+        ctx.fillStyle = 'green';
+        lowerSubset.forEach(point => {
+            ctx.beginPath();
+            ctx.arc(point.x, point.y, 3 * dpr, 0, Math.PI * 2);
+            ctx.fill();
+        });
+    }
+
+    // Draw discarded points
+    if (discardedPoints) {
+        ctx.fillStyle = 'gray';
+        discardedPoints.forEach(point => {
+            ctx.beginPath();
+            ctx.arc(point.x, point.y, 3 * dpr, 0, Math.PI * 2);
+            ctx.fill();
+        });
+    }
+
+    // Draw convex hulls of subsets
+    if (upperHull) {
+        drawConvexHull(upperHull, 'blue');
+    }
+    if (lowerHull) {
+        drawConvexHull(lowerHull, 'green');
+    }
+
+    // Draw final convex hull
     if (currentStep === convexHullSteps.length - 1) {
-        drawConvexHull(convexHull);
+        drawConvexHull(convexHull, 'purple');
     }
 }
 
-// Function to draw convex hull
-function drawConvexHull(hull) {
+function drawConvexHull(hull, color) {
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2 * dpr;
     ctx.beginPath();
     ctx.moveTo(hull[0].x, hull[0].y);
     for (let i = 1; i < hull.length; i++) {
         ctx.lineTo(hull[i].x, hull[i].y);
     }
     ctx.closePath();
-    ctx.strokeStyle = 'green';
-    ctx.lineWidth = 2 * dpr; // Account for pixel ratio
     ctx.stroke();
 }
-
-
-
-
-
-
 
 function animateConvexHull() {
     let stepCounter = 0;
@@ -400,7 +613,6 @@ function drawPoints() {
 }
 
 
-
 // Function to update slider
 function updateSlider() {
     const slider = document.getElementById('slider');
@@ -411,10 +623,11 @@ function updateSlider() {
 // Add event listener for slider
 const slider = document.getElementById('slider');
 slider.addEventListener('input', () => {
+    const stepValue = parseInt(slider.value);
     if (algorithm === 'jarvisMarch') {
-        updateStepJarvisMarch(parseInt(slider.value));
+        updateStepJarvisMarch(stepValue);
     } else if (algorithm === 'kirkpatrickSeidel') {
-        updateStepKirkpatrickSeidel(parseInt(slider.value));
+        updateStepKirkpatrickSeidel(stepValue);
     }
 });
 
@@ -422,6 +635,7 @@ slider.addEventListener('input', () => {
 const algorithmSelect = document.getElementById('algorithmSelect');
 algorithmSelect.addEventListener('change', () => {
     algorithm = algorithmSelect.value;
+    computeConvexHull();
 });
 
 // Function to compute convex hull
@@ -432,5 +646,3 @@ function computeConvexHull() {
         computeConvexHullKirkpatrickSeidel();
     }
 }
-
-
