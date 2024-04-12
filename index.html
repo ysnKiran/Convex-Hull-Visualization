@@ -4,6 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
+    <style>
+        .daa-button {
+            margin-left: 20px;
+            padding: 10px;
+            background-color: #4CAF50; /* Green */
+            border: none;
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            transition-duration: 0.4s;
+            cursor: pointer;
+        }
+
+        .daa-button:hover {
+            background-color: white; 
+            color: black; 
+            border: 2px solid #4CAF50;
+        }
+    </style>
 </head>
 
 <body>
@@ -27,6 +48,8 @@
             <div class="slider-container">
                 <input type="range" min="0" value="0" id="slider" oninput="updateStep()">
                 <span id="stepLabel">Step 0</span>
+                <button onclick="window.location.href='daa.html'" class="daa-button">Open Analysis</button>
+                <button onclick="window.location.href='daa.html'" class="daa-button">Open Documentation</button>
             </div>
             <div id="explanation"></div>
         </div>

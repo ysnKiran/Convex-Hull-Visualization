@@ -1,4 +1,32 @@
-const canvas = document.getElementById('canvas');
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: script.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: script.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 
 // Set canvas dimensions and pixel ratio
@@ -43,7 +71,7 @@ function generateRandomPoints() {
     const numPoints = 10; // Number of random points
     const maxX = canvasWidth - 20; // Max X coordinate
     const maxY = canvasHeight - 20; // Max Y coordinate
-    for (let i = 0; i < numPoints; i++) {
+    for (let i = 0; i &lt; numPoints; i++) {
         const x = Math.floor(Math.random() * (maxX - 10)) + 10; // Random X coordinate within canvas
         const y = Math.floor(Math.random() * (maxY - 10)) + 10; // Random Y coordinate within canvas
         points.push({ x, y });
@@ -81,12 +109,12 @@ function handleCanvasClick(event) {
         const y = (event.clientY - rect.top) * dpr; // Account for pixel ratio
 
         // Check if the point is inside the canvas
-        if (x >= 0 && x < canvas.width && y >= 0 && y < canvas.height) {
+        if (x >= 0 &amp;&amp; x &lt; canvas.width &amp;&amp; y >= 0 &amp;&amp; y &lt; canvas.height) {
             const canvasX = x / dpr; // Convert back to canvas coordinates
             const canvasY = y / dpr;
 
             // Check if the point is within the canvas boundaries
-            if (canvasX >= 10 && canvasX <= canvasWidth - 10 && canvasY >= 10 && canvasY <= canvasHeight - 10) {
+            if (canvasX >= 10 &amp;&amp; canvasX &lt;= canvasWidth - 10 &amp;&amp; canvasY >= 10 &amp;&amp; canvasY &lt;= canvasHeight - 10) {
                 points.push({ x: canvasX, y: canvasY });
                 drawPoints();
                 updateSlider();
@@ -102,15 +130,15 @@ function handleCanvasClick(event) {
  * Function to compute convex hull using Jarvis March algorithm
  */
 function computeConvexHullJarvisMarch() {
-    if (points.length < 3) {
+    if (points.length &lt; 3) {
         alert('At least 3 points are required to compute the convex hull.');
         return;
     }
 
     convexHull = [];
     let leftmost = points[0];
-    for (let i = 1; i < points.length; i++) {
-        if (points[i].x < leftmost.x) {
+    for (let i = 1; i &lt; points.length; i++) {
+        if (points[i].x &lt; leftmost.x) {
             leftmost = points[i];
         }
     }
@@ -123,7 +151,7 @@ function computeConvexHullJarvisMarch() {
     do {
         convexHull.push(current);
         next = points[0];
-        for (let i = 1; i < points.length; i++) {
+        for (let i = 1; i &lt; points.length; i++) {
             convexHullSteps.push({
                 hull: [...convexHull],
                 lines: [{ from: current, to: points[i] }], // Add individual line for each comparison
@@ -180,7 +208,7 @@ function updateStepJarvisMarch(stepValue) {
     ctx.beginPath();
     if (hull.length > 0) {
         ctx.moveTo(hull[0].x, hull[0].y);
-        for (let i = 1; i < hull.length; i++) {
+        for (let i = 1; i &lt; hull.length; i++) {
             ctx.lineTo(hull[i].x, hull[i].y);
         }
         ctx.strokeStyle = 'green';
@@ -197,7 +225,7 @@ function updateStepJarvisMarch(stepValue) {
     }
 
     // Draw final joining line
-    if (currentStep === convexHullSteps.length - 1 && hull.length > 1) {
+    if (currentStep === convexHullSteps.length - 1 &amp;&amp; hull.length > 1) {
         ctx.beginPath();
         ctx.moveTo(hull[hull.length - 1].x, hull[hull.length - 1].y);
         ctx.lineTo(hull[0].x, hull[0].y);
@@ -223,7 +251,7 @@ function updateStepJarvisMarch(stepValue) {
  * Function to compute convex hull using Kirkpatrick-Seidel algorithm
  */
 function computeConvexHullKirkpatrickSeidel() {
-    if (points.length < 3) {
+    if (points.length &lt; 3) {
         alert('At least 3 points are required to compute the convex hull.');
         return;
     }
@@ -249,22 +277,22 @@ function findIntersectionEdges(points, medianX) {
     let left = null;
     let right = null;
 
-    for (let i = 0; i < points.length; i++) {
+    for (let i = 0; i &lt; points.length; i++) {
         if (points[i].x === medianX) {
             if (!left) left = points[i];
             else right = points[i];
         }
     }
 
-    for (let i = 0; i < points.length - 1; i++) {
+    for (let i = 0; i &lt; points.length - 1; i++) {
         const p1 = points[i];
         const p2 = points[i + 1];
-        if ((p1.x < medianX && p2.x > medianX) || (p1.x > medianX && p2.x < medianX)) {
+        if ((p1.x &lt; medianX &amp;&amp; p2.x > medianX) || (p1.x > medianX &amp;&amp; p2.x &lt; medianX)) {
             intersectionEdges.push({ from: p1, to: p2 });
         }
     }
 
-    if (left && right) {
+    if (left &amp;&amp; right) {
         bridgeEdge = { from: left, to: right };
     }
 
@@ -284,9 +312,9 @@ function discardNonContributingPoints(points, intersectionEdges) {
     const lowerPoints = [];
     let bridgeEdge = null;
 
-    for (let i = 0; i < points.length; i++) {
+    for (let i = 0; i &lt; points.length; i++) {
         let isContributing = true;
-        for (let j = 0; j < intersectionEdges.length; j++) {
+        for (let j = 0; j &lt; intersectionEdges.length; j++) {
             const edge = intersectionEdges[j];
             const orientationP1 = orientation(edge.from, edge.to, points[i]);
             if (orientationP1 === -1) {
@@ -295,7 +323,7 @@ function discardNonContributingPoints(points, intersectionEdges) {
             } else if (orientationP1 === 0) {
                 const minX = Math.min(edge.from.x, edge.to.x);
                 const maxX = Math.max(edge.from.x, edge.to.x);
-                if (points[i].x >= minX && points[i].x <= maxX) {
+                if (points[i].x >= minX &amp;&amp; points[i].x &lt;= maxX) {
                     bridgeEdge = edge;
                     isContributing = true;
                 }
@@ -303,7 +331,7 @@ function discardNonContributingPoints(points, intersectionEdges) {
         }
         if (isContributing) {
             if (bridgeEdge) {
-                if (points[i].y < bridgeEdge.from.y) {
+                if (points[i].y &lt; bridgeEdge.from.y) {
                     lowerPoints.push(points[i]);
                 } else if (points[i].y > bridgeEdge.from.y) {
                     upperPoints.push(points[i]);
@@ -322,7 +350,7 @@ function discardNonContributingPoints(points, intersectionEdges) {
 
 //     // Find the rightmost point of the upper hull
 //     let rightmostUpperIndex = 0;
-//     for (let i = 1; i < upperHull.length; i++) {
+//     for (let i = 1; i &lt; upperHull.length; i++) {
 //         if (upperHull[i].x > upperHull[rightmostUpperIndex].x) {
 //             rightmostUpperIndex = i;
 //         }
@@ -330,8 +358,8 @@ function discardNonContributingPoints(points, intersectionEdges) {
 
 //     // Find the leftmost point of the lower hull
 //     let leftmostLowerIndex = 0;
-//     for (let i = 1; i < lowerHull.length; i++) {
-//         if (lowerHull[i].x < lowerHull[leftmostLowerIndex].x) {
+//     for (let i = 1; i &lt; lowerHull.length; i++) {
+//         if (lowerHull[i].x &lt; lowerHull[leftmostLowerIndex].x) {
 //             leftmostLowerIndex = i;
 //         }
 //     }
@@ -372,12 +400,12 @@ function mergeConvexHulls(upperHull, lowerHull) {
     const mergedHull = [];
 
     // Add points from the upper hull
-    for (let i = 0; i < upperHull.length; i++) {
+    for (let i = 0; i &lt; upperHull.length; i++) {
         mergedHull.push(upperHull[i]);
     }
 
     // Add points from the lower hull (excluding the first and last points)
-    for (let i = 1; i < lowerHull.length - 1; i++) {
+    for (let i = 1; i &lt; lowerHull.length - 1; i++) {
         mergedHull.push(lowerHull[i]);
     }
 
@@ -417,7 +445,7 @@ function findUpperBridge(leftPoints, rightPoints) {
         }
     }
 
-    for (let i = 1; i < rightPoints.length; i++) {
+    for (let i = 1; i &lt; rightPoints.length; i++) {
         const rightPoint = rightPoints[i];
         if (orientation(leftBridge, rightPoint, rightBridge) === -1) {
             rightBridge = rightPoint;
@@ -435,15 +463,15 @@ function findUpperBridge(leftPoints, rightPoints) {
  * Function to find upper hull
  */
 function findUpperHull(points) {
-    if (points.length <= 1) {
+    if (points.length &lt;= 1) {
         return points;
     }
 
     points.sort((a, b) => a.x === b.x ? a.y - b.y : a.x - b.x);
 
     const upperHull = [];
-    for (let i = 0; i < points.length; i++) {
-        while (upperHull.length >= 2 && orientation(upperHull[upperHull.length - 2], upperHull[upperHull.length - 1], points[i]) !== -1) {
+    for (let i = 0; i &lt; points.length; i++) {
+        while (upperHull.length >= 2 &amp;&amp; orientation(upperHull[upperHull.length - 2], upperHull[upperHull.length - 1], points[i]) !== -1) {
             upperHull.pop();
         }
         upperHull.push(points[i]);
@@ -459,7 +487,7 @@ function findUpperHull(points) {
  * Function to find lower hull
  */
 function findLowerHull(points) {
-    if (points.length <= 1) {
+    if (points.length &lt;= 1) {
         return points;
     }
 
@@ -467,7 +495,7 @@ function findLowerHull(points) {
 
     const lowerHull = [];
     for (let i = points.length - 1; i >= 0; i--) {
-        while (lowerHull.length >= 2 && orientation(lowerHull[lowerHull.length - 2], lowerHull[lowerHull.length - 1], points[i]) !== -1) {
+        while (lowerHull.length >= 2 &amp;&amp; orientation(lowerHull[lowerHull.length - 2], lowerHull[lowerHull.length - 1], points[i]) !== -1) {
             lowerHull.pop();
         }
         lowerHull.push(points[i]);
@@ -494,7 +522,7 @@ function findLowerBridge(leftPoints, rightPoints) {
         }
     }
 
-    for (let i = 1; i < rightPoints.length; i++) {
+    for (let i = 1; i &lt; rightPoints.length; i++) {
         const rightPoint = rightPoints[i];
         if (orientation(leftBridge, rightPoint, rightBridge) === 1) {
             rightBridge = rightPoint;
@@ -507,11 +535,11 @@ function findLowerBridge(leftPoints, rightPoints) {
 /**
  * 
  * @param {int pair array} points 
- * @returns
+ * @returns hull
  * Function to compute convex hull using Kirkpatrick-Seidel algorithm
  */
 function kirkpatrickSeidel(points) {
-    if (points.length <= 3) {
+    if (points.length &lt;= 3) {
         convexHullSteps.push({ hull: points });
         return points;
     }
@@ -526,8 +554,8 @@ function kirkpatrickSeidel(points) {
     convexHullSteps.push({ intersectionEdges: intersectionEdges, bridgeEdge: bridgeEdge, points: [...points] });
 
     const slopes = [];
-    for (let i = 0; i < points.length; i++) {
-        for (let j = i + 1; j < points.length; j++) {
+    for (let i = 0; i &lt; points.length; i++) {
+        for (let j = i + 1; j &lt; points.length; j++) {
             const slope = (points[j].y - points[i].y) / (points[j].x - points[i].x);
             slopes.push(slope);
         }
@@ -543,7 +571,7 @@ function kirkpatrickSeidel(points) {
     convexHullSteps.push({
         upperSubset: remainingPoints.upper,
         lowerSubset: remainingPoints.lower,
-        discardedPoints: points.filter(p => !remainingPoints.upper.includes(p) && !remainingPoints.lower.includes(p)),
+        discardedPoints: points.filter(p => !remainingPoints.upper.includes(p) &amp;&amp; !remainingPoints.lower.includes(p)),
         points: [...points]
     });
 
@@ -602,7 +630,7 @@ function updateStepKirkpatrickSeidel(stepValue) {
         ctx.lineTo(medianLine.x, canvas.height);
         ctx.stroke();
 
-        const leftSubset = points.filter(point => point.x < medianLine.x);
+        const leftSubset = points.filter(point => point.x &lt; medianLine.x);
         const rightSubset = points.filter(point => point.x > medianLine.x);
 
         ctx.fillStyle = 'blue';
@@ -670,7 +698,7 @@ function updateStepKirkpatrickSeidel(stepValue) {
         drawConvexHull(convexHull, 'purple', 4); // Increase line width for the final convex hull
     }
 
-    if (upperHull && upperSubset) {
+    if (upperHull &amp;&amp; upperSubset) {
         drawConvexHull(upperHull, 'blue');
         ctx.fillStyle = 'rgba(0, 0, 255, 0.2)';
         ctx.beginPath();
@@ -680,7 +708,7 @@ function updateStepKirkpatrickSeidel(stepValue) {
         ctx.closePath();
         ctx.fill();
     }
-    if (lowerHull && lowerSubset) {
+    if (lowerHull &amp;&amp; lowerSubset) {
         drawConvexHull(lowerHull, 'green');
         ctx.fillStyle = 'rgba(0, 255, 0, 0.2)';
         ctx.beginPath();
@@ -748,7 +776,7 @@ function drawConvexHull(hull, color, lineWidth = 2) {
     ctx.lineWidth = lineWidth * dpr;
     ctx.beginPath();
     ctx.moveTo(hull[0].x, hull[0].y);
-    for (let i = 1; i < hull.length; i++) {
+    for (let i = 1; i &lt; hull.length; i++) {
         ctx.lineTo(hull[i].x, hull[i].y);
     }
     ctx.closePath();
@@ -770,7 +798,7 @@ function animateConvexHull() {
         }
         stepCounter++;
 
-        if (stepCounter < convexHullSteps.length) {
+        if (stepCounter &lt; convexHullSteps.length) {
             animationFrameId = requestAnimationFrame(animate);
         } else {
             cancelAnimationFrame(animationFrameId);
@@ -786,7 +814,7 @@ function animateConvexHull() {
 async function drawPoints() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = 'white';
-    for (let i = 0; i < points.length; i++) {
+    for (let i = 0; i &lt; points.length; i++) {
         await new Promise(resolve => setTimeout(resolve, 100)); // Delay of 0.5 sec
         ctx.beginPath();
         ctx.arc(points[i].x, points[i].y, 3 * dpr, 0, Math.PI * 2); // Account for pixel ratio
@@ -830,4 +858,26 @@ function computeConvexHull() {
     } else if (algorithm === 'kirkpatrickSeidel') {
         computeConvexHullKirkpatrickSeidel();
     }
-} 
+} </code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#animateConvexHull">animateConvexHull</a></li><li><a href="global.html#clearCanvas">clearCanvas</a></li><li><a href="global.html#computeConvexHull">computeConvexHull</a></li><li><a href="global.html#computeConvexHullJarvisMarch">computeConvexHullJarvisMarch</a></li><li><a href="global.html#computeConvexHullKirkpatrickSeidel">computeConvexHullKirkpatrickSeidel</a></li><li><a href="global.html#discardNonContributingPoints">discardNonContributingPoints</a></li><li><a href="global.html#drawConvexHull">drawConvexHull</a></li><li><a href="global.html#drawPoints">drawPoints</a></li><li><a href="global.html#findIntersectionEdges">findIntersectionEdges</a></li><li><a href="global.html#findLowerBridge">findLowerBridge</a></li><li><a href="global.html#findLowerHull">findLowerHull</a></li><li><a href="global.html#findUpperBridge">findUpperBridge</a></li><li><a href="global.html#findUpperHull">findUpperHull</a></li><li><a href="global.html#generateRandomPoints">generateRandomPoints</a></li><li><a href="global.html#getStepExplanation">getStepExplanation</a></li><li><a href="global.html#handleCanvasClick">handleCanvasClick</a></li><li><a href="global.html#kirkpatrickSeidel">kirkpatrickSeidel</a></li><li><a href="global.html#mergeConvexHulls">mergeConvexHulls</a></li><li><a href="global.html#orientation">orientation</a></li><li><a href="global.html#toggleManualPlacement">toggleManualPlacement</a></li><li><a href="global.html#updateSlider">updateSlider</a></li><li><a href="global.html#updateStepJarvisMarch">updateStepJarvisMarch</a></li><li><a href="global.html#updateStepKirkpatrickSeidel">updateStepKirkpatrickSeidel</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Fri Apr 12 2024 14:51:30 GMT+0530 (India Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
