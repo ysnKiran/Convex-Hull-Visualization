@@ -21,8 +21,10 @@
                 <button onclick="generateRandomPoints()">Generate Random Points</button>
                 <button onclick="clearCanvas()">Clear Canvas</button>
                 <button onclick="computeConvexHull()">Compute Convex Hull</button>
-                <button id="myToggleButton" class="toggle-button" onclick="toggleManualPlacement()">Manual Placement Mode</button>
-                
+                <div class="slider-container">
+                    <input type="range" min="0" max="2" value="0" id="pointSlider" oninput="updatePointCount(this.value)">
+                    <span id="pointLabel">Points: 5</span>
+                </div>
             </div>
             <div class="slider-container">
                 <input type="range" min="0" value="0" id="slider" oninput="updateStep(this.value)">
@@ -30,6 +32,7 @@
             </div>
         </div>
     </div>
+    <script src="points.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
