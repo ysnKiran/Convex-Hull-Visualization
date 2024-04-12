@@ -45,6 +45,8 @@ function updatePointCount(value) {
     generateRandomPoints();
 }
 
+// Store the last generated points
+let lastPoints = [];
 // Function to generate random points within the canvas
 function generateRandomPoints() {
     let pointSet = [];
@@ -57,15 +59,17 @@ function generateRandomPoints() {
     do {
         randomIndex = Math.floor(Math.random() * window.points.length);
         pointSet = window.points[randomIndex];
-    } while (pointSet.length !== numPoints);
+    } while (pointSet.length !== numPoints || JSON.stringify(pointSet) === JSON.stringify(lastPoints));
 
     // Assign the selected set of points to the global points array
     points = pointSet;
 
+    // Store the current points as the last generated points
+    lastPoints = pointSet.slice();
+
     drawPoints();
     updateSlider();
 }
-
 
 // Function to clear canvas
 function clearCanvas() {
@@ -213,98 +217,141 @@ function orientation(p, q, r) {
     return val > 0 ? 1 : -1; // Clockwise or counterclockwise
 }
 
-function findHull(points) {
+function recursiveHull(points) {
     if (points.length <= 3) {
         return points;
     }
 
-    const mid = Math.floor(points.length / 2);
-    const leftPoints = points.slice(0, mid);
-    const rightPoints = points.slice(mid);
+    const median = findMedianOfMedians(points);
+    const leftPoints = points.filter(p => p.x < median.x);
+    const rightPoints = points.filter(p => p.x > median.x);
 
-    const leftHull = findHull(leftPoints);
-    const rightHull = findHull(rightPoints);
+    const leftHull = recursiveHull(leftPoints);
+    const rightHull = recursiveHull(rightPoints);
 
-    return mergeHulls(leftHull, rightHull);
+    return mergedHull(leftHull, rightHull, median);
 }
 
-function getUpperTangent(leftHull, rightHull) {
+function getUpperBridge(leftHull, rightHull, median) {
     let leftIdx = leftHull.length - 1;
     let rightIdx = 0;
-    let upperTangent = [null, null];
+    let upperBridge = [null, null];
 
     while (true) {
-        upperTangent[0] = leftHull[leftIdx];
-        upperTangent[1] = rightHull[rightIdx];
+        upperBridge[0] = leftHull[leftIdx];
+        upperBridge[1] = rightHull[rightIdx];
+
+        convexHullSteps.push({
+            hull: [...convexHull],
+            lines: [
+                { from: { x: median.x, y: 0 }, to: { x: median.x, y: canvas.height } }, // Median line
+                { from: upperBridge[0], to: upperBridge[1] }, // Upper bridge
+            ],
+            currentPoint: null,
+        });
 
         const leftNext = (leftIdx + 1) % leftHull.length;
         const rightNext = (rightIdx + 1) % rightHull.length;
 
-        if (orientation(leftHull[leftIdx], rightHull[rightIdx], rightHull[rightNext]) < 0) {
+        if (orientation(leftHull[leftIdx], median, rightHull[rightNext]) < 0) {
             rightIdx = rightNext;
-        } else if (orientation(rightHull[rightIdx], leftHull[leftIdx], leftHull[leftNext]) > 0) {
+        } else if (orientation(median, leftHull[leftIdx], leftHull[leftNext]) > 0) {
             leftIdx = leftNext;
         } else {
             break;
         }
     }
 
-    return upperTangent;
+    return upperBridge;
 }
 
-function getLowerTangent(leftHull, rightHull) {
+function getLowerBridge(leftHull, rightHull, median) {
     let leftIdx = 0;
     let rightIdx = rightHull.length - 1;
-    let lowerTangent = [null, null];
+    let lowerBridge = [null, null];
 
     while (true) {
-        lowerTangent[0] = leftHull[leftIdx];
-        lowerTangent[1] = rightHull[rightIdx];
+        lowerBridge[0] = leftHull[leftIdx];
+        lowerBridge[1] = rightHull[rightIdx];
+
+        convexHullSteps.push({
+            hull: [...convexHull],
+            lines: [
+                { from: { x: median.x, y: 0 }, to: { x: median.x, y: canvas.height } }, // Median line
+                { from: lowerBridge[0], to: lowerBridge[1] }, // Lower bridge
+            ],
+            currentPoint: null,
+        });
 
         const leftNext = (leftIdx + 1) % leftHull.length;
         const rightPrev = (rightIdx - 1 + rightHull.length) % rightHull.length;
 
-        if (orientation(leftHull[leftIdx], rightHull[rightIdx], rightHull[rightPrev]) > 0) {
+        if (orientation(leftHull[leftIdx], median, rightHull[rightPrev]) > 0) {
             rightIdx = rightPrev;
-        } else if (orientation(rightHull[rightIdx], leftHull[leftIdx], leftHull[leftNext]) < 0) {
+        } else if (orientation(median, leftHull[leftIdx], leftHull[leftNext]) < 0) {
             leftIdx = leftNext;
         } else {
             break;
         }
     }
 
-    return lowerTangent;
+    return lowerBridge;
 }
 
-function mergeHulls(leftHull, rightHull) {
-    const upperTangent = getUpperTangent(leftHull, rightHull);
-    const lowerTangent = getLowerTangent(leftHull, rightHull);
+function mergedHull(leftHull, rightHull, median) {
+    const upperBridge = getUpperBridge(leftHull, rightHull, median);
+    const lowerBridge = getLowerBridge(leftHull, rightHull, median);
 
     const mergedHull = [];
 
     // Add points from left hull to merged hull
-    let currentPoint = upperTangent[0];
+    let currentPoint = upperBridge[0];
     let currentIndex = leftHull.indexOf(currentPoint);
-    while (currentPoint !== lowerTangent[0]) {
+    while (currentPoint !== lowerBridge[0]) {
         mergedHull.push(currentPoint);
         currentIndex = (currentIndex + 1) % leftHull.length;
         currentPoint = leftHull[currentIndex];
     }
 
-    mergedHull.push(lowerTangent[0]);
+    mergedHull.push(lowerBridge[0]);
 
     // Add points from right hull to merged hull
-    currentPoint = lowerTangent[1];
+    currentPoint = lowerBridge[1];
     currentIndex = rightHull.indexOf(currentPoint);
-    while (currentPoint !== upperTangent[1]) {
+    while (currentPoint !== upperBridge[1]) {
         mergedHull.push(currentPoint);
         currentIndex = (currentIndex + 1) % rightHull.length;
         currentPoint = rightHull[currentIndex];
     }
 
-    mergedHull.push(upperTangent[1]);
+    mergedHull.push(upperBridge[1]);
 
     return mergedHull;
+}
+
+function findMedianOfMedian(points) {
+    const n = points.length;
+    const groups = [];
+
+    // Divide the points into groups of 5
+    for (let i = 0; i < n; i += 5) {
+        const group = points.slice(i, i + 5);
+        groups.push(group);
+    }
+
+    // Find the median of each group
+    const medians = groups.map(group => {
+        group.sort((a, b) => a.x - b.x);
+        return group[Math.floor(group.length / 2)];
+    });
+
+    // Recursively find the median of the medians
+    if (medians.length <= 5) {
+        medians.sort((a, b) => a.x - b.x);
+        return medians[Math.floor(medians.length / 2)];
+    } else {
+        return findMedianOfMedian(medians);
+    }
 }
 
 function computeConvexHullKirkpatrickSeidel() {
@@ -321,7 +368,7 @@ function computeConvexHullKirkpatrickSeidel() {
     const sortedPoints = points.slice().sort((a, b) => a.x - b.x);
 
     // Find the convex hull using the Kirkpatrick-Seidel algorithm
-    convexHull = findHull(sortedPoints);
+    convexHull = recursiveHull(sortedPoints);
     convexHullSteps.push({ hull: [...convexHull] });
 
     animateConvexHull();
@@ -414,6 +461,10 @@ function updateSlider() {
     const slider = document.getElementById('slider');
     slider.max = convexHullSteps.length - 1;
     slider.value = currentStep;
+}
+
+function findMedianOfMedians(points) {
+    return Math.floor(points.length / 2);
 }
 
 // Add event listener for slider
