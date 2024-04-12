@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DAA Assignment</title>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            color: rgb(0, 4, 8);
+            font-family: 'Montserrat', sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: rgb(150, 226, 244);
+        }
+
+        .navbar {
+
+            padding: 1em 0;
+            background-color: rgb(74, 202, 245);
+            display: flex;
+            flex-direction: row;
+            width: 100%;
+            justify-content: center;
+            margin: auto;
+            box-shadow: 0 6px 15px 2px rgb(82 142 240 / 69%);
+        }
+
+        .q {
+
+            text-decoration: none;
+            margin: 0 2.6em;
+            padding-top: 1em;
+        }
+
+        .q:hover {
+            color: rgb(50, 111, 255);
+        }
+
+        .question {
+
+            padding: 60px 90px;
+        }
+
+        #question0 {
+
+            padding-right: 30%;
+            /* background-color: rgb(30 28 28); */
+        }
+
+        #ford-fulkerson {
+
+            padding-left: 30%;
+            background-color: rgb(202, 234, 168);
+        }
+
+        #question2 {
+
+            padding-right: 30%;
+        }
+
+        #question3 {
+
+            padding-left: 30%;
+            background-color: rgb(202, 234, 168);
+        }
+
+        #question4 {
+
+            padding-right: 30%;
+            /* background-color: rgb(30 28 28); */
+
+        }
+        #text {
+
+            padding-right: 30%;
+            /* background-color: rgb(30 28 28); */
+
+        }
+
+        #question5 {
+
+            padding-left: 30%;
+            background-color: rgb(202, 234, 168);
+        }
+
+        h2 {
+
+            color: rgb(57 135 228);
+            padding: 10px 0;
+            font-size: 34px;
+        }
+
+        h3 {
+
+            padding: 15px 0;
+            font-size: 22px;
+        }
+
+        .output,
+        .efficiency,
+        .memory {
+
+            margin-left: 23px;
+        }
+
+        @media screen and (min-width: 1300px) {
+
+            .question {
+
+                padding: 60px 170px;
+            }
+        }
+
+        p {
+
+            padding: 10px 0;
+        }
+
+        .footer {
+
+            width: 100%;
+            text-align: center;
+            font-size: 24px;
+            padding: 35px 0;
+        }
+    </style>
+</head>
+
+
+<body>
+    <div class="full">
+
+        <div class="navbar">
+
+            <a class="q" href="#question0">
+                Overview
+            </a>
+
+            <a class="q" href="#ford-fulkerson">
+                Jarvis March Algorithm
+            </a>
+
+            <a class="q" href="#question2">
+                KirkPatrick Seidel Algorithm
+            </a>
+
+            <a class="q" href="#question3">
+                Graph Analysis
+            </a>
+
+            <a class="q" href="#question5">
+                Inferences
+            </a>
+        </div>
+
+        <div class="body">
+
+            <div id="question0" class="question">
+
+                <h2>Overview</h2>
+
+                <p>
+                    We made use of the Jarvis March Algorithm along with the KirkPatrick Seidel Algorithm to compute the Convex hull of a set of points. The project contains a graphical visualization of the working of the computation, along with a canvas to input points into.<br><br>
+                    The algorithms are written in vanilla javascript an excellent choice for web applications and is well documented with the help of Doxygen pages.
+                    <br><br>
+                </p>
+
+                <h3>
+                    Link to documentation page- <a href="./out/index.html">Documentation page</a>
+                </h3>
+            </div>
+
+            <div id="ford-fulkerson" class="question">
+                <h2>Jarvis March Algorithm</h2>
+                <p>The Jarvis March algorithm, also known as the Gift Wrapping algorithm, is a computational geometry method used to find the convex hull of a set of points. The convex hull can be thought of as the smallest convex polygon that encompasses all the points in the set.
+<br><br>
+The algorithm begins by identifying the leftmost point, or the point with the smallest x-coordinate, and designates it as the current point. This is the starting point for the algorithm.
+<br><br>
+Next, the algorithm searches through all the remaining points to find the one that is most counterclockwise to the current point. This is achieved by comparing the orientation of triples of points. The point found to be the most counterclockwise is then set as the current point.
+<br><br>
+This process is repeated, with the algorithm continuously finding the most counterclockwise point from the current point, until it eventually returns to the starting point. At this stage, the algorithm has successfully computed the convex hull.
+<br><br>
+In terms of time complexity, the Jarvis March algorithm operates at O(nh), where 'n' represents the number of points and 'h' represents the number of points on the convex hull. This makes it less efficient than other convex hull algorithms, particularly when dealing with larger inputs. However, the Jarvis March algorithm can be simpler to understand and implement, making it a popular choice in certain scenarios.
+
+
+                
+                </p>
+            </div>
+            <div id="question2" class="question">
+
+                <h2>KirkPatrick Seidel Algorithm</h2>
+
+                The Kirkpatrick-Seidel algorithm, also known as the ultimate planar convex hull algorithm, is a divide-and-conquer approach to compute the convex hull of a set of points in a plane. The convex hull is the smallest convex polygon that encompasses all the points.
+<br><br>
+The algorithm starts by identifying the points with the smallest and largest x-coordinates, which are guaranteed to be part of the convex hull. These points divide the remaining points into two sets: those that are above the line connecting the two points (upper hull) and those that are below (lower hull).
+<br><br>
+The algorithm then applies a "prune-and-search" technique, a variant of the median-finding algorithm. For each set of points (upper and lower hull), the algorithm finds the point that forms the maximum area triangle with the line segment as the base. This point is also part of the convex hull.
+<br><br>
+The process is then recursively applied to the points that are left of this point and above the line (for the upper hull), and to the points that are right of this point and below the line (for the lower hull). This divide-and-conquer approach continues until all points on the convex hull are identified.
+<br><br>
+The Kirkpatrick–Seidel algorithm has a worst-case time complexity of O(n log h), where 'n' is the number of points and 'h' is the number of points on the convex hull. This makes it more efficient than other convex hull algorithms such as the Gift Wrapping algorithm for larger inputs, but it is more complex to understand and implement.
+            </div>
+            <div id="question3" class="question">
+
+                <h2>Graph Analysis</h2>
+                The algorithms were run on 8 different random points dataset comprising of 10, 100, 1000, 10000, 100000, 1000000, 10000000, 20000000 points. Every dataset was run 10 times and the average times were noted to account for accuracy and incosistency.
+                <br><br>
+                <h3> Jarvis March Algorithm </h3>
+                <img src="images/jmp.png" alt="Jarvis March">
+                <br><br>
+                <img src="images/jm.png" alt="Jarvis March">
+                <br><br>
+                <h3> KirkPatrick Seidel Algorithm </h3>
+                <img src="images/kpsp.png" alt="KPS algo">
+                <br><br>
+                <img src="images/kps.png" alt="KPS algo">   
+                <h3> Comparison </h3>
+                <img src="images/cmp.png" alt="KPS algo">             
+            </div>
+         <div id="question5" class="question">
+
+                <h2>Inferences</h2>
+                
+                As described in the paper "On the ultimate convex hull algorithm in practice" by MM McQueen and GT Toussaint, The results suggest that although the O(n Log h) algorithms may be the ‘ultimate’ ones in theory, they are of little practical value from the point of view of running time. This is seen in our case as well where Jarvis March algorithm(O(nh)) although being very bad in theory as compared to KPS algorithm(O(nlogh)), still outperforms it practically. This is supposedly due to the large time costant associated with the KPS algorithm. 
+                
+                <br><br>
+                
+                Ref: McQUEEN, M. M., & Toussaint, G. T. (1985). On the ultimate convex hull algorithm in practice. Pattern Recognition Letters, 3(1), 29-34.
+                
+          </div>
+      
+            <div class="footer">
+
+                <a href="./out/index.html">Documentation page</a>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
